@@ -6,6 +6,7 @@ from libs.auth_middleware import get_current_user, jwt_required
 from libs.database import db
 from models.trip import Trip
 from models.trip_plan import TripPlan
+from utils.itinerary import generate_default_plans
 
 trips_bp = Blueprint("trips", __name__, url_prefix="/api/trips")
 
@@ -225,6 +226,38 @@ def delete_trip(trip_id):
 # ---------------------------------------------------------------------------
 # TripPlan CRUD  —  /api/trips/<trip_id>/plans
 # ---------------------------------------------------------------------------
+
+@trips_bp.route("/<int:trip_id>/plans/generate", methods=["POST"])
+@jwt_required
+def generate_plans(trip_id):
+    """Generate a default itinerary template for every day of the trip.
+
+    Query param:
+        replace (bool, default false) — if true, delete existing plans first.
+    """
+    user = get_current_user()
+    trip = _get_owned_trip(trip_id, user.id)
+    if not trip:
+        return jsonify({"error": "Trip not found."}), 404
+
+    replace = request.args.get("replace", "false").lower() == "true"
+
+    try:
+        if replace:
+            TripPlan.query.filter_by(trip_id=trip_id).delete()
+
+        plans = generate_default_plans(trip)
+        db.session.add_all(plans)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "Failed to generate itinerary. Please try again."}), 500
+
+    result = TripPlan.query.filter_by(trip_id=trip_id).order_by(
+        TripPlan.plan_seq
+    ).all()
+    return jsonify([_serialize_plan(p) for p in result]), 201
+
 
 @trips_bp.route("/<int:trip_id>/plans", methods=["GET"])
 @jwt_required
