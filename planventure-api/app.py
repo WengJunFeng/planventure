@@ -3,27 +3,38 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
 from sqlalchemy import text
 
+from libs.config import Config
+from libs.database import db, init_db
+from routes.auth import auth_bp
+
 load_dotenv(".sample.env")
-
-db = SQLAlchemy()
-
-
-class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///planventure.db")
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JSON_SORT_KEYS = False
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-db.init_app(app)
-Migrate(app, db)
+jwt = JWTManager(app)
+init_db(app)
 CORS(app, origins=os.getenv("CORS_ORIGINS", "*").split(","))
+
+app.register_blueprint(auth_bp)
+
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({"error": "Token has expired."}), 401
+
+
+@jwt.invalid_token_loader
+def invalid_token_callback(reason):
+    return jsonify({"error": f"Invalid token: {reason}"}), 401
+
+
+@jwt.unauthorized_loader
+def missing_token_callback(reason):
+    return jsonify({"error": "Authorization token is required."}), 401
 
 @app.route('/')
 def home():

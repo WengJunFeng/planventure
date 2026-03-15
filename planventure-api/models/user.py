@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 
-import bcrypt
-
-from app import db
+from libs.database import db
+from utils.jwt import generate_access_token, generate_refresh_token, generate_tokens
+from utils.password import hash_password, verify_password
 
 
 class User(db.Model):
@@ -24,16 +24,22 @@ class User(db.Model):
     )
 
     def set_password(self, password: str) -> None:
-        """Hash and store a plaintext password."""
-        self.password_hash = bcrypt.hashpw(
-            password.encode("utf-8"), bcrypt.gensalt()
-        ).decode("utf-8")
+        self.password_hash = hash_password(password)
 
     def check_password(self, password: str) -> bool:
-        """Return True if the plaintext password matches the stored hash."""
-        return bcrypt.checkpw(
-            password.encode("utf-8"), self.password_hash.encode("utf-8")
-        )
+        return verify_password(password, self.password_hash)
+
+    def get_tokens(self) -> dict:
+        """Return a fresh access + refresh token pair for this user."""
+        return generate_tokens(self.id)
+
+    def get_access_token(self) -> str:
+        """Return a fresh access token for this user."""
+        return generate_access_token(self.id)
+
+    def get_refresh_token(self) -> str:
+        """Return a fresh refresh token for this user."""
+        return generate_refresh_token(self.id)
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email!r}>"
