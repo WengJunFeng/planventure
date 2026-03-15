@@ -17,5 +17,13 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite:///planventure.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # CORS
+    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    CORS_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+    CORS_ALLOW_HEADERS = ["Content-Type", "Authorization"]
+    CORS_EXPOSE_HEADERS = ["Content-Type", "Authorization"]
+    CORS_SUPPORTS_CREDENTIALS = os.getenv("CORS_SUPPORTS_CREDENTIALS", "false").lower() == "true"
+    CORS_MAX_AGE = int(os.getenv("CORS_MAX_AGE", "600"))  # preflight cache seconds
+
     # General
     JSON_SORT_KEYS = False

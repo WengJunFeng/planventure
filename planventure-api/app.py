@@ -18,7 +18,15 @@ app.config.from_object(Config)
 
 jwt = JWTManager(app)
 init_db(app)
-CORS(app, origins=os.getenv("CORS_ORIGINS", "*").split(","))
+CORS(
+    app,
+    origins=app.config["CORS_ORIGINS"],
+    methods=app.config["CORS_METHODS"],
+    allow_headers=app.config["CORS_ALLOW_HEADERS"],
+    expose_headers=app.config["CORS_EXPOSE_HEADERS"],
+    supports_credentials=app.config["CORS_SUPPORTS_CREDENTIALS"],
+    max_age=app.config["CORS_MAX_AGE"],
+)
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(trips_bp)
