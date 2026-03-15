@@ -3,10 +3,11 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
-load_dotenv()
+load_dotenv(".sample.env")
 
 db = SQLAlchemy()
 
@@ -21,11 +22,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
+Migrate(app, db)
 CORS(app, origins=os.getenv("CORS_ORIGINS", "*").split(","))
-
-
-with app.app_context():
-    db.create_all()
 
 @app.route('/')
 def home():

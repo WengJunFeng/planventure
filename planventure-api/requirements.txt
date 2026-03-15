@@ -5,7 +5,7 @@ python-dotenv==1.0.0
 
 # Database and ORM
 flask-sqlalchemy==3.1.1
-sqlalchemy==2.0.25
+sqlalchemy==2.0.36
 flask-migrate==4.0.7
 
 # Authentication and security
