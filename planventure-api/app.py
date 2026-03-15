@@ -9,6 +9,7 @@ from sqlalchemy import text
 from libs.config import Config
 from libs.database import db, init_db
 from routes.auth import auth_bp
+from routes.trips import trips_bp
 
 load_dotenv(".sample.env")
 
@@ -20,6 +21,7 @@ init_db(app)
 CORS(app, origins=os.getenv("CORS_ORIGINS", "*").split(","))
 
 app.register_blueprint(auth_bp)
+app.register_blueprint(trips_bp)
 
 
 @jwt.expired_token_loader

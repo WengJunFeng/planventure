@@ -25,9 +25,6 @@ class Trip(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
 
-    # Itinerary (free-form text or JSON notes per day)
-    itinerary = db.Column(db.Text, nullable=True)
-
     # Timestamps
     created_at = db.Column(
         db.DateTime(timezone=True),
