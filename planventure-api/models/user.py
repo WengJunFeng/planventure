@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 
+from sqlalchemy.dialects.mysql import BIGINT as MYSQL_BIGINT
+
 from libs.database import db
 from utils.jwt import generate_access_token, generate_refresh_token, generate_tokens
 from utils.password import hash_password, verify_password
@@ -11,6 +13,21 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
+
+    # MinIO storage credentials (per-user bucket configuration)
+    minio_access_key = db.Column(db.String(255), nullable=True)
+    minio_secret_key = db.Column(db.String(255), nullable=True)
+    minio_bucket = db.Column(db.String(255), nullable=True)
+    user_cloud_storage_quota = db.Column(
+        db.BigInteger().with_variant(MYSQL_BIGINT(unsigned=True), "mysql"),
+        nullable=False,
+        default=5 * 1024 * 1024,  # 5 GB in KB
+    )
+    user_storage_usage = db.Column(
+        db.BigInteger().with_variant(MYSQL_BIGINT(unsigned=True), "mysql"),
+        nullable=False,
+        default=0,  # KB used in MinIO storage
+    )
     created_at = db.Column(
         db.DateTime(timezone=True),
         nullable=False,

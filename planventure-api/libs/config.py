@@ -25,5 +25,12 @@ class Config:
     CORS_SUPPORTS_CREDENTIALS = os.getenv("CORS_SUPPORTS_CREDENTIALS", "false").lower() == "true"
     CORS_MAX_AGE = int(os.getenv("CORS_MAX_AGE", "600"))  # preflight cache seconds
 
+    # File uploads
+    UPLOAD_FOLDER = os.getenv(
+        "UPLOAD_FOLDER",
+        os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), "instance", "uploads"),
+    )
+    MAX_CONTENT_LENGTH = int(os.getenv("MAX_UPLOAD_SIZE_MB", "16")) * 1024 * 1024  # default 16 MB
+
     # General
     JSON_SORT_KEYS = False
