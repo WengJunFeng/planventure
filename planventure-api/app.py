@@ -10,7 +10,7 @@ from libs.config import Config
 from libs.database import db, init_db
 from routes.auth import auth_bp
 from routes.trips import trips_bp
-from routes.photos import photos_bp, uploads_bp
+from routes.photos import photos_bp
 
 load_dotenv(".sample.env")
 
@@ -32,7 +32,6 @@ CORS(
 app.register_blueprint(auth_bp)
 app.register_blueprint(trips_bp)
 app.register_blueprint(photos_bp)
-app.register_blueprint(uploads_bp)
 
 
 @jwt.expired_token_loader

@@ -19,8 +19,9 @@ class TripPhoto(db.Model):
     # Photo info
     pict_name = db.Column(db.String(255), nullable=False)
     pict_time = db.Column(db.DateTime(timezone=True), nullable=True)
-    pict_small_url = db.Column(db.String(1024), nullable=True)
-    pict_origin_url = db.Column(db.String(1024), nullable=False)
+    pict_small_url = db.Column(db.String(1024), nullable=True)   # MinIO object key
+    pict_origin_url = db.Column(db.String(1024), nullable=False)  # MinIO object key
+    pict_size_kb = db.Column(db.Integer, nullable=False, default=0)  # total KB stored (original + thumbnail)
 
     # User comment
     comment = db.Column(db.Text, nullable=True)

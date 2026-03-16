@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from libs.database import db
 from models.user import User
+from utils.minio_storage import provision_user_storage
 from utils.validators import validate_email, validate_password
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -32,6 +33,8 @@ def register():
         user = User(email=email)
         user.set_password(password)
         db.session.add(user)
+        db.session.flush()  # assign user.id before provisioning
+        provision_user_storage(user)
         db.session.commit()
     except Exception:
         db.session.rollback()

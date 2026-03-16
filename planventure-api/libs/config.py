@@ -32,5 +32,11 @@ class Config:
     )
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_UPLOAD_SIZE_MB", "16")) * 1024 * 1024  # default 16 MB
 
+    # MinIO object storage
+    MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "")          # e.g. "localhost:9000"
+    MINIO_ROOT_ACCESS_KEY = os.getenv("MINIO_ROOT_ACCESS_KEY", "")
+    MINIO_ROOT_SECRET_KEY = os.getenv("MINIO_ROOT_SECRET_KEY", "")
+    MINIO_SECURE = os.getenv("MINIO_SECURE", "false").lower() == "true"  # True for HTTPS
+
     # General
     JSON_SORT_KEYS = False
